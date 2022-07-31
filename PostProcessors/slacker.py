@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/local/autopkg/python
 #
 # Copyright 2017 Graham Pugh
 #
@@ -24,43 +24,31 @@ from autopkglib import Processor, ProcessorError
 
 __all__ = ["Slacker"]
 
+
 class Slacker(Processor):
-    description = ("Posts to Slack via webhook based on output of a JSSImporter run. "
-                    "Takes elements from " "https://gist.github.com/devStepsize/b1b795309a217d24566dcc0ad136f784"
-                    "and "
-                    "https://github.com/autopkg/nmcspadden-recipes/blob/master/PostProcessors/Yo.py")
+    description = (
+        "Posts to Slack via webhook based on output of a JSSImporter run. "
+        "Takes elements from "
+        "https://gist.github.com/devStepsize/b1b795309a217d24566dcc0ad136f784"
+        "and "
+        "https://github.com/autopkg/nmcspadden-recipes/blob/master/PostProcessors/Yo.py"
+    )
     input_variables = {
-        "JSS_URL": {
-            "required": False,
-            "description": ("JSS_URL.")
-        },
-        "policy_category": {
-            "required": False,
-            "description": ("Policy Category.")
-        },
-        "category": {
-            "required": False,
-            "description": ("Package Category.")
-        },
-        "prod_name": {
-            "required": False,
-            "description": ("PROD_NAME")
-        },
+        "JSS_URL": {"required": False, "description": ("JSS_URL.")},
+        "policy_category": {"required": False, "description": ("Policy Category.")},
+        "category": {"required": False, "description": ("Package Category.")},
+        "prod_name": {"required": False, "description": ("PROD_NAME")},
         "jss_changed_objects": {
             "required": False,
-            "description": ("Dictionary of added or changed values.")
+            "description": ("Dictionary of added or changed values."),
         },
         "jss_importer_summary_result": {
             "required": False,
-            "description": ("Description of interesting results.")
+            "description": ("Description of interesting results."),
         },
-        "webhook_url": {
-            "required": False,
-            "description": ("Slack webhook.")
-        }
+        "webhook_url": {"required": False, "description": ("Slack webhook.")},
     }
-    output_variables = {
-    }
+    output_variables = {}
 
     __doc__ = description
 
@@ -84,18 +72,30 @@ class Slacker(Processor):
             print("Category: %s" % category)
             print("Policy Category: %s" % policy_category)
             if jss_uploaded_package:
-                slack_text = "*New installer package added to Jamf Pro:*\nURL: %s\nTitle: *%s*\nCategory: *%s*\nPolicy Name: *%s*\nUploaded Package Name: *%s*" % (JSS_URL, output_title, category, jss_policy_name, jss_uploaded_package)
+                slack_text = (
+                    "*New installer package added to Jamf Pro:*\nURL: %s\nTitle: *%s*\nCategory: *%s*\nPolicy Name: *%s*\nUploaded Package Name: *%s*"
+                    % (
+                        JSS_URL,
+                        output_title,
+                        category,
+                        jss_policy_name,
+                        jss_uploaded_package,
+                    )
+                )
             else:
-                slack_text = "*No change to current Jamf Pro installer package:*\nURL: %s\nTitle: *%s*\nCategory: *%s*\nPolicy Name: *%s*\nNo new package uploaded" % (JSS_URL, output_title, category, jss_policy_name)
+                slack_text = (
+                    "*No change to current Jamf Pro installer package:*\nURL: %s\nTitle: *%s*\nCategory: *%s*\nPolicy Name: *%s*\nNo new package uploaded"
+                    % (JSS_URL, output_title, category, jss_policy_name)
+                )
 
-            slack_data = {'text': slack_text}
+            slack_data = {"text": slack_text}
 
             response = requests.post(webhook_url, json=slack_data)
             if response.status_code != 200:
                 raise ValueError(
-                                'Request to slack returned an error %s, the response is:\n%s'
-                                % (response.status_code, response.text)
-                                )
+                    "Request to slack returned an error %s, the response is:\n%s"
+                    % (response.status_code, response.text)
+                )
 
 
 if __name__ == "__main__":
